@@ -1,0 +1,12 @@
+{
+  "scripts": {
+    "test":           "playwright test",
+    "test:chromium":  "playwright test --project=chromium",
+    "test:firefox":   "playwright test --project=firefox",
+    "test:webkit":    "playwright test --project=webkit",
+    "test:login":     "playwright test tests/auth/",
+    "test:cart":      "playwright test tests/cart/",
+    "test:checkout":  "playwright test tests/checkout/",
+    "report":         "playwright show-report"
+  }
+}
