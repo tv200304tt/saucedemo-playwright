@@ -4,6 +4,12 @@ export const UserType = {
   Problem: 'problem_user',
   PerformanceGlitch: 'performance_glitch_user',
 };
+export const SortOption = {
+  NameAZ: 'az',
+  NameZA: 'za',
+  PriceLowHigh: 'lohi',
+  PriceHighLow: 'hilo',
+};
 
 export const PASSWORD = 'secret_sauce';
 
@@ -24,4 +30,5 @@ export const USERS = {
     username: 'performance_glitch_user',
     password: PASSWORD,
   },
+  
 };

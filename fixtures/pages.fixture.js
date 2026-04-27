@@ -4,9 +4,11 @@ import { LoginPage } from '../pages/LoginPage';
 import { InventoryPage } from '../pages/InventoryPage';
 import { CartPage } from '../pages/CartPage';
 import { CheckoutPage } from '../pages/CheckoutPage';
+import { ProductDetailPage } from '../pages/ProductDetailPage';
 import { USERS, UserType } from '../helpers/constants';
 
 export const test = base.extend({
+
   // ── Basic fixtures ──────────────────────────
   loginPage: async ({ page }, use) => {
     await use(new LoginPage(page));
@@ -40,7 +42,8 @@ export const test = base.extend({
 
     await page.waitForURL(/.*inventory/);
 
-    await use(new InventoryPage(page));
+    const inventory = new InventoryPage(page);
+    await use(inventory);
   },
 
   // ── Cart with items ─────────────────────────
@@ -53,12 +56,22 @@ export const test = base.extend({
       USERS[UserType.Standard].password
     );
 
-    const inv = new InventoryPage(page);
-    await inv.addMultipleToCart([0, 1]);
-    await inv.goToCart();
+    await page.waitForURL(/.*inventory/);
 
-    await use(new CartPage(page));
-  },
+    const inventory = new InventoryPage(page);
+
+    // add 2 items (có thể chỉnh)
+    await inventory.addToCart(0);
+    await inventory.addToCart(1);
+
+    await inventory.goToCart();
+
+    const cart = new CartPage(page);
+
+    // ✔ QUAN TRỌNG: phải gọi use()
+    await use(cart);
+  }
+
 });
 
 export { expect };

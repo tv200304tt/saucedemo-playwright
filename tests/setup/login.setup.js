@@ -1,23 +1,23 @@
-import { test as setup, expect } from '@playwright/test';
+import { test, expect } from '@playwright/test';
 
-setup('login once', async ({ page }) => {
+test('login once', async ({ page }) => {
 
-  // 👉 dùng URL full cho chắc
-  await page.goto('https://www.saucedemo.com');
+  // 1. đi tới login page (QUAN TRỌNG)
+  await page.goto('https://www.saucedemo.com/');
 
-  // 👉 wait page load
-  await expect(page.locator('[data-test="login-button"]')).toBeVisible();
+  // 2. wait đúng element login
+  await expect(page.locator('[data-test="login-button"]'))
+    .toBeVisible({ timeout: 10000 });
 
-  // 👉 login
+  // 3. login
   await page.fill('[data-test="username"]', 'standard_user');
   await page.fill('[data-test="password"]', 'secret_sauce');
-
   await page.click('[data-test="login-button"]');
 
-  // 👉 verify login thành công
-  await page.waitForURL(/inventory/);
+  // 4. verify login success
+  await expect(page).toHaveURL(/.*inventory/);
 
-  // 👉 lưu session
+  // 5. save storage
   await page.context().storageState({
     path: 'storageState.json',
   });

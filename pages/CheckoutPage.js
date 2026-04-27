@@ -11,7 +11,7 @@ export class CheckoutPage extends BasePage {
     this.lastNameInput   = page.locator('[data-test="lastName"]');
     this.zipCodeInput    = page.locator('[data-test="postalCode"]');
     this.continueButton  = page.locator('[data-test="continue"]');
-    this.cancelButton    = page.locator('[data-test="cancel"]');
+    
     this.errorMessage    = page.locator('[data-test="error"]');
     this.errorClose      = page.locator('.error-button');
 
@@ -21,12 +21,19 @@ export class CheckoutPage extends BasePage {
     this.taxLabel        = page.locator('.summary_tax_label');
     this.totalLabel      = page.locator('.summary_total_label');
     this.finishButton    = page.locator('[data-test="finish"]');
-    this.overviewCancel  = page.locator('[data-test="cancel"]');
+   
 
     // Confirmation
     this.confirmHeader   = page.locator('[data-test="complete-header"]');
     this.confirmText     = page.locator('[data-test="complete-text"]');
     this.backHomeButton  = page.locator('[data-test="back-to-products"]');
+  }
+  async cancelStep1() {
+    await this.cancelButton.click();
+  }
+
+  async cancelStep2() {
+    await this.overviewCancel.click();
   }
 
   // ── Actions ───────────────────────────────────────────────
@@ -89,7 +96,7 @@ export class CheckoutPage extends BasePage {
   // ── Assertions ────────────────────────────────────────────
   async expectOrderComplete() {
     await expect(this.confirmHeader).toContainText('Thank you for your order');
-    await this.expectURL(/.*checkout-complete/);
+    await expect(this.page).toHaveURL(/.*checkout-complete/);
   }
 
   async expectErrorMessage(message) {

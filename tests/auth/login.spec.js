@@ -1,7 +1,8 @@
 import { test, expect } from '../../fixtures/pages.fixture';
 import { USERS, UserType, PASSWORD } from '../../helpers/constants';
+import { LoginPage } from '../../pages/LoginPage';
 
-test.describe('Module LOGIN – 12 Test Cases', () => {
+test.describe('Module LOGIN - 12 Test Cases', () => {
 
   test.beforeEach(async ({ loginPage }) => {
     await loginPage.goto();
@@ -49,6 +50,7 @@ test.describe('Module LOGIN – 12 Test Cases', () => {
     );
   });
 
+
   // ── TC-007 ─────────────────────────────
   test('TC-007: Username trống', async ({ loginPage }) => {
     await loginPage.login('', PASSWORD);
@@ -83,11 +85,18 @@ test.describe('Module LOGIN – 12 Test Cases', () => {
     const type = await loginPage.getPasswordInputType();
     expect(type).toBe('password');
   });
-
+  
   // ── TC-012 ─────────────────────────────
   test('TC-012: Enter submit', async ({ loginPage }) => {
     await loginPage.loginWithEnter('standard_user', PASSWORD);
     await loginPage.expectLoginSuccess();
   });
+  //-----TC-013-------------------------------
+  test('TC-013: Username có space đầu/cuối -> login fail', async ({ loginPage }) => {
+  await loginPage.login('  standard_user   ', 'secret_sauce');
 
+  await loginPage.expectLoginError(
+    'Username and password do not match any user'
+  )
+})
 });
