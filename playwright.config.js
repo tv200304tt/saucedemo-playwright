@@ -28,7 +28,7 @@ export default defineConfig({
   {
     name: 'chromium',
     use: {
-      storageState: 'storageState.json',
+      storageState: process.env.CI ? undefined : 'storageState.json'
     },
     dependencies: ['setup'],
   },
