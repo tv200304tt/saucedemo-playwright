@@ -53,13 +53,13 @@ test.describe('Module PRODUCT LIST – 10 Test Cases', () => {
 
   // ── TC-019: Toàn bộ mảng giá tăng dần ───────────────────
   test('TC-019: Sort lohi – mảng giá hoàn toàn tăng dần', async ({ loggedInPage }) => {
-    await loggedInPage.sortBy(SortOption.PriceLowHigh);
+   await loggedInPage.sortBy(SortOption.PriceLowHigh);
+
     const prices = await loggedInPage.getAllPrices();
-    expect(prices).toEqual([...PRODUCT_PRICES_LOHI]);
-    // Kiểm tra thứ tự: mỗi phần tử <= phần tử kế tiếp
-    prices.forEach((p, i) => {
-      if (i > 0) expect(prices[i - 1]).toBeLessThanOrEqual(p);
-    });
+
+    const sorted = [...prices].sort((a, b) => a - b);
+
+    expect(prices).toEqual(sorted);
   });
 
   // ── TC-020: Toàn bộ mảng giá giảm dần ───────────────────

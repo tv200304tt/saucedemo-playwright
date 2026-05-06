@@ -1,102 +1,91 @@
-import { expect } from '@playwright/test';
-import { BasePage } from './BasePage';
+// pages/InventoryPage.js
+const { expect } = require('@playwright/test');
+const { BasePage } = require('./BasePage');
 
-export class InventoryPage extends BasePage {
+class InventoryPage extends BasePage {
   constructor(page) {
     super(page);
-
     this.productItems     = page.locator('.inventory_item');
+    this.addToCartButtons = page.locator('[data-test^="add-to-cart"]');
+    this.removeButtons    = page.locator('[data-test^="remove"]');
     this.cartBadge        = page.locator('.shopping_cart_badge');
     this.cartLink         = page.locator('.shopping_cart_link');
-    this.sortDropdown     = page.locator('[data-test="product_sort_container"]');
+    this.sortDropdown     = page.locator('[data-test="product-sort-container"]');
+    this.productNames     = page.locator('.inventory_item_name');
+    this.productPrices    = page.locator('.inventory_item_price');
+    this.productImages    = page.locator('.inventory_item_img img');
   }
 
-  // ── ACTIONS ─────────────────────────
+  // ── Actions ──────────────────────────────────────────────────────────
+  async addToCart(index) {
+    await this.addToCartButtons.nth(index).click();
+  }
 
- async sortBy(option) {
-  // đảm bảo dropdown tồn tại
-  await this.sortDropdown.waitFor({ state: 'visible', timeout: 10000 });
+  async addMultipleToCart(indices) {
+    for (const i of indices) {
+      await this.addToCart(i);
+    }
+  }
 
-  const firstBefore = await this.getFirstProductName();
+  async addAllToCart() {
+    const count = await this.addToCartButtons.count();
+    for (let i = 0; i < count; i++) {
+      // Luôn click nút đầu tiên vì sau mỗi lần click nút đó biến mất
+      await this.addToCartButtons.first().click();
+    }
+  }
 
-  await this.sortDropdown.selectOption(option);
+  async removeFromCart(index) {
+    await this.removeButtons.nth(index).click();
+  }
 
-  // wait sort apply
-  await this.page.waitForFunction(
-    ([selector, prev]) => {
-      const el = document.querySelector(selector);
-      return el && el.textContent !== prev;
-    },
-    ['.inventory_item_name', firstBefore]
-  );
-}
+  async sortBy(option) {
+    await this.sortDropdown.selectOption(option);
+    await this.page.waitForTimeout(300);
+  }
+
+  async goToCart() {
+    await this.cartLink.click();
+    await this.page.waitForURL(/.*cart/);
+  }
 
   async clickProductName(index) {
-    await this.productItems.nth(index)
-      .locator('.inventory_item_name')
-      .click();
-  }
+  const item = this.productItems.nth(index);
+
+  await item.locator('.inventory_item_name').click();
+}
 
   async clickProductImage(index) {
-    await this.productItems.nth(index)
-      .locator('.inventory_item_img img')
-      .click();
+    await this.productImages.nth(index).click();
   }
 
-  // ── GETTERS ─────────────────────────
-
+  // ── Getters ───────────────────────────────────────────────────────────
   async getProductCount() {
-    return await this.productItems.count();
+    return this.productItems.count();
+  }
+
+  async getCartBadgeText() {
+    return this.getTextContent(this.cartBadge);
   }
 
   async getAllProductNames() {
-    const names = [];
-    const count = await this.productItems.count();
-
-    for (let i = 0; i < count; i++) {
-      const text = await this.productItems.nth(i)
-        .locator('.inventory_item_name')
-        .textContent();
-
-      names.push(text.trim());
-    }
-
-    return names;
-  }
-
-  async getFirstProductName() {
-    const text = await this.productItems.first()
-      .locator('.inventory_item_name')
-      .textContent();
-
-    return text.trim();
+    return this.productNames.allTextContents();
   }
 
   async getAllPrices() {
-    const prices = [];
-    const count = await this.productItems.count();
+    const texts = await this.productPrices.allTextContents();
+    return texts.map(t => parseFloat(t.replace('$', '')));
+  }
 
-    for (let i = 0; i < count; i++) {
-      const text = await this.productItems.nth(i)
-        .locator('.inventory_item_price')
-        .textContent();
-
-      prices.push(parseFloat(text.replace('$', '').trim()));
-    }
-
-    return prices;
+  async getFirstProductName() {
+    return this.getTextContent(this.productNames.first());
   }
 
   async getFirstProductPrice() {
-    const text = await this.productItems.first()
-      .locator('.inventory_item_price')
-      .textContent();
-
-    return parseFloat(text.replace('$', '').trim());
+    return this.parsePrice(this.productPrices.first());
   }
 
-  // ── ASSERTIONS ─────────────────────
-
+  // ── Assertions ────────────────────────────────────────────────────────
   async expectBadgeCount(count) {
     await expect(this.cartBadge).toHaveText(String(count));
   }
@@ -104,5 +93,6 @@ export class InventoryPage extends BasePage {
   async expectBadgeNotVisible() {
     await expect(this.cartBadge).not.toBeVisible();
   }
-} /*$ts = Get-Date -Format "yyyyMMdd-HHmmss"
-npx playwright test  tests/products/product-list.spec.js  --reporter=html --output=reports/$ts*/
+}
+
+module.exports = { InventoryPage };

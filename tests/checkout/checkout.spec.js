@@ -7,10 +7,10 @@ import {
 import { CartPage } from '../../pages/CartPage';
 import { CheckoutPage } from '../../pages/CheckoutPage';
 
-test.describe('Module CHECKOUT – 13 Test Cases (incl. Data-Driven)', () => {
+test.describe('Module CHECKOUT – 11 Test Cases ', () => {
 
   // Helper: đưa hệ thống về trạng thái 'đang ở checkout step 1'
-  async function navigateToCheckout(Page) {
+  async function navigateToCheckout(page) {
     const cartPage = new CartPage(page);
     await cartPage.checkout();
     await page.waitForURL(/.*checkout-step-one/);
@@ -48,24 +48,30 @@ test.describe('Module CHECKOUT – 13 Test Cases (incl. Data-Driven)', () => {
   });
 
   // ── TC-047: Cancel step 1 → cart ──────────────────────────
-  test('TC-047: Cancel step 1 → quay về cart', async ({ cartWithItems }) => {
-    const chk = await navigateToCheckout(cartWithItems.page);
-    await chk.cancel();
-    await expect(chk.page).toHaveURL(/.*cart/);
-    // Verify giỏ hàng vẫn còn
-    const cart = new CartPage(chk.page);
-    expect(await cart.getItemCount()).toBeGreaterThan(0);
-  });
+  test('TC-047: Cancel step 1 → quay về cart',
+    async ({ cartWithItems }) => {
+      const chk = await navigateToCheckout(cartWithItems.page);
+      // Click trực tiếp để không phụ thuộc CheckoutPage.cancel()
+      await chk.page.locator('[data-test="cancel"]').click();
+      await expect(chk.page).toHaveURL(/.*cart/);
+      // Giỏ hàng vẫn còn sản phẩm
+      const cart = new CartPage(chk.page);
+      expect(await cart.getItemCount()).toBeGreaterThan(0);
+    }
+  );
 
   // ── TC-048: Cancel step 2 → inventory ─────────────────────
-  test('TC-048: Cancel step 2 (Overview) → về Inventory', async ({ cartWithItems }) => {
-    const chk = await navigateToCheckout(cartWithItems.page);
-    await chk.fillInfo(VALID_CHECKOUT);
-    await chk.continue();
-    await chk.page.waitForURL(/.*checkout-step-two/);
-    await chk.cancel();
-    await expect(chk.page).toHaveURL(/.*inventory/);
-  });
+test('TC-048: Cancel step 2 (Overview) → về Inventory',
+    async ({ cartWithItems }) => {
+      const chk = await navigateToCheckout(cartWithItems.page);
+      await chk.fillInfo(VALID_CHECKOUT);
+      await chk.continue();
+      await chk.page.waitForURL(/.*checkout-step-two/);
+      // Click trực tiếp để không phụ thuộc CheckoutPage.cancel()
+      await chk.page.locator('[data-test="cancel"]').click();
+      await expect(chk.page).toHaveURL(/.*inventory/);
+    }
+  );
 
   // ── TC-049: Item Total = tổng giá ─────────────────────────
   test('TC-049: Item Total = tổng giá sản phẩm (trước thuế)',

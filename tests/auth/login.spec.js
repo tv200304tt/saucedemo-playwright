@@ -2,7 +2,7 @@ import { test, expect } from '../../fixtures/pages.fixture';
 import { USERS, UserType, PASSWORD } from '../../helpers/constants';
 import { LoginPage } from '../../pages/LoginPage';
 
-test.describe('Module LOGIN - 12 Test Cases', () => {
+test.describe('Module LOGIN - 13 Test Cases', () => {
 
   test.beforeEach(async ({ loginPage }) => {
     await loginPage.goto();

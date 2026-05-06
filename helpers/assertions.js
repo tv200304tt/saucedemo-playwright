@@ -45,3 +45,16 @@ export function extendExpect() {
     },
   });
 }
+async function goToFirstProductDetail(loggedInPage) {
+  const name = await loggedInPage.getFirstProductName();
+  const price = await loggedInPage.getFirstProductPrice();
+
+  await loggedInPage.clickProductName(0);
+
+  // 🔥 QUAN TRỌNG
+  await expect(loggedInPage.page).toHaveURL(/inventory-item/);
+
+  const detail = new ProductDetailPage(loggedInPage.page);
+
+  return { detail, name, price };
+}

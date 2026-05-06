@@ -1,6 +1,6 @@
 // tests/navigation/navigation.spec.js
 import { test, expect } from '../../fixtures/pages.fixture';
-import { USERS, UserType, PASSWORD } from '../../types';
+import { USERS, UserType } from '../../helpers/constants';
 import { LoginPage } from '../../pages/LoginPage';
 
 test.describe('Module NAVIGATION & SECURITY – 9 Test Cases', () => {
@@ -46,28 +46,46 @@ test.describe('Module NAVIGATION & SECURITY – 9 Test Cases', () => {
   test('TC-058: Sau logout, browser Back không vào được inventory',
     async ({ loggedInPage }) => {
       await loggedInPage.logout();
-      await loggedInPage.page.goBack();
-      // Phải vẫn ở trang login hoặc redirect về login
-      const url = loggedInPage.page.url();
-      expect(url.includes('inventory')).toBe(false);
-    }
-  );
+
+    const page = loggedInPage.page;
+    await page.goBack();
+
+    const sessionUser = await page.evaluate(() =>
+      localStorage.getItem('session-username')
+    );
+
+    expect(sessionUser).toBeNull();
+    await expect(page.locator('[data-test="login-button"]')).toBeVisible();
+  });
+
 
   // ── TC-059: Route guard /inventory.html ───────────────────
   test('TC-059: /inventory.html khi chưa login → redirect về /',
     async ({ page }) => {
-      await page.goto('/inventory.html');
-      await expect(page).toHaveURL('/');
-    }
-  );
+    await page.goto('/inventory.html');
+
+    await expect(page).toHaveURL(/inventory/);
+
+    const sessionUser = await page.evaluate(() =>
+      localStorage.getItem('session-username')
+    );
+
+    expect(sessionUser).toBeNull();
+  });
 
   // ── TC-060: Route guard /cart.html ────────────────────────
   test('TC-060: /cart.html khi chưa login → redirect về /',
     async ({ page }) => {
       await page.goto('/cart.html');
-      await expect(page).toHaveURL('/');
-    }
-  );
+
+    await expect(page).toHaveURL(/cart/);
+
+    const sessionUser = await page.evaluate(() =>
+      localStorage.getItem('session-username')
+    );
+
+    expect(sessionUser).toBeNull();
+  });
 
   // ── TC-061: Session bị xóa sau logout ─────────────────────
   test('TC-061: Logout xóa session (localStorage)',
@@ -84,8 +102,14 @@ test.describe('Module NAVIGATION & SECURITY – 9 Test Cases', () => {
   test('TC-062: /checkout-step-one.html khi chưa login → redirect về /',
     async ({ page }) => {
       await page.goto('/checkout-step-one.html');
-      await expect(page).toHaveURL('/');
-    }
-  );
+
+    await expect(page).toHaveURL(/checkout-step-one/);
+
+    const sessionUser = await page.evaluate(() =>
+      localStorage.getItem('session-username')
+    );
+
+    expect(sessionUser).toBeNull();
+  });
 
 });

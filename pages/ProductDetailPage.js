@@ -9,7 +9,7 @@ export class ProductDetailPage extends BasePage {
     this.productName   = page.locator('.inventory_details_name');
     this.productDesc   = page.locator('.inventory_details_desc');
     this.productPrice  = page.locator('.inventory_details_price');
-    this.productImage  = page.locator('.inventory_details_img img');
+    this.productImage = page.locator('.inventory_details_img');
 
     this.addToCartBtn  = page.locator('[data-test^="add-to-cart"]');
     this.removeBtn     = page.locator('[data-test^="remove"]');
@@ -56,12 +56,14 @@ export class ProductDetailPage extends BasePage {
   }
 
   // ── Assertions ────────────────────────────
-  async expectProductDetailVisible() {
-    await expect(this.productName).toBeVisible();
-    await expect(this.productDesc).toBeVisible();
-    await expect(this.productPrice).toBeVisible();
-    await expect(this.productImage).toBeVisible();
-  }
+async expectProductDetailVisible() {
+  await this.page.waitForURL(/inventory-item/);
+
+  await expect(this.productName).toBeVisible();
+  await expect(this.productDesc).toBeVisible();
+  await expect(this.productPrice).toBeVisible();
+  await expect(this.productImage).toBeVisible();
+} 
 
   async expectProductName(name) {
     await expect(this.productName).toHaveText(name);
