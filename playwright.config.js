@@ -1,13 +1,14 @@
-import { defineConfig } from '@playwright/test';
+import { defineConfig, devices } from '@playwright/test';
 
 export default defineConfig({
   testDir: './tests',
 
   fullyParallel: true,
 
+  timeout: 60000,
+
   use: {
     baseURL: 'https://www.saucedemo.com',
-    storageState: 'storageState.json',
     headless: true,
 
     trace: 'on-first-retry',
@@ -18,19 +19,40 @@ export default defineConfig({
     navigationTimeout: 30000,
   },
 
-  timeout: 60000,
-
   projects: [
-  {
-    name: 'setup',
-    testMatch: /.*\.setup\.js/,
-  },
-  {
-    name: 'chromium',
-    use: {
-      storageState: process.env.CI ? undefined : 'storageState.json'
+    {
+      name: 'setup',
+      testMatch: /.*\.setup\.js/,
+      use: {
+        storageState: undefined,
+      },
     },
-    dependencies: ['setup'],
-  },
-],
+
+    {
+      name: 'chromium',
+      use: {
+        ...devices['Desktop Chrome'],
+        storageState: 'storageState.json',
+      },
+      dependencies: ['setup'],
+    },
+
+    {
+      name: 'firefox',
+      use: {
+        ...devices['Desktop Firefox'],
+        storageState: 'storageState.json',
+      },
+      dependencies: ['setup'],
+    },
+
+    {
+      name: 'webkit',
+      use: {
+        ...devices['Desktop Safari'],
+        storageState: 'storageState.json',
+      },
+      dependencies: ['setup'],
+    },
+  ],
 });

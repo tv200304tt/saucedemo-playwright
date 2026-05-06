@@ -17,9 +17,19 @@ class BasePage {
   }
 
   async openSidebar() {
-    await this.page.locator('#react-burger-menu-btn').click();
-    await this.page.locator('.bm-menu').waitFor({ state: 'visible' });
+    const menuButton = this.page.locator('#react-burger-menu-btn');
+
+    await menuButton.click();
+
+    // Wait menu item usable
+    await expect(
+      this.page.locator('#logout_sidebar_link')
+    ).toBeVisible();
   }
+
+
+  
+
 
   async logout() {
     await this.openSidebar();

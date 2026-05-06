@@ -133,9 +133,8 @@ test.describe('Module CART – 11 Test Cases', () => {
     expect(badgeBefore).toBe(2);
 
     // Reload trang
-    await loggedInPage.page.reload();
-    await loggedInPage.page.waitForLoadState('networkidle');
-
+   await loggedInPage.page.reload();
+   await expect(loggedInPage.cartBadge).toHaveText('2');
     // Badge vẫn phải = 2 (nhờ localStorage)
     const badgeAfter = await getCartBadgeCount(loggedInPage.page);
     expect(badgeAfter).toBe(2);
