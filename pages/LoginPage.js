@@ -22,7 +22,7 @@ export class LoginPage extends BasePage {
     
   }
 
-  // ✅ FIX: KHÔNG wait navigation ở đây
+  
   async login(username, password) {
     await this.usernameInput.fill(username ?? '');
     await this.passwordInput.fill(password ?? '');
@@ -51,13 +51,13 @@ export class LoginPage extends BasePage {
     return await this.passwordInput.getAttribute('type');
   }
 
-  // ✅ SUCCESS chỉ check ở đây
+  // SUCCESS 
   async expectLoginSuccess() {
     await this.page.waitForURL(/inventory/);
     await expect(this.inventoryList).toBeVisible();
   }
 
-  // ✅ FAIL chỉ check ở đây
+  // FAIL 
   async expectLoginError(message) {
     await expect(this.errorMessage).toBeVisible();
     await expect(this.errorMessage).toContainText(message);
