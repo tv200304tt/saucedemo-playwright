@@ -18,6 +18,10 @@ export default defineConfig({
     actionTimeout: 10000,
     navigationTimeout: 30000,
   },
+    reporter: [
+    ['html', { open: 'never' }],
+    ['list']
+  ],
 
   projects: [
     {
